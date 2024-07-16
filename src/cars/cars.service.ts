@@ -1,6 +1,11 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { Car } from './interfaces/car.interface';
 import { v4 as uuid } from 'uuid';
+import { CreateCarDTO, UpdateCarDTO } from './dto';
 
 @Injectable()
 export class CarsService {
@@ -32,5 +37,40 @@ export class CarsService {
     if (!car) throw new NotFoundException(`Car with ID ${id} not found`);
 
     return car;
+  }
+
+  create(createCarDto: CreateCarDTO) {
+    const newCar: Car = {
+      id: uuid(),
+      ...createCarDto,
+    };
+
+    this.cars.push(newCar);
+
+    return newCar;
+  }
+
+  update(id: string, updateCarDto: UpdateCarDTO) {
+    let carDB = this.findOneById(id);
+
+    if (updateCarDto.id && updateCarDto.id !== id) {
+      throw new BadRequestException(
+        'ID parameter does not match ID in the body',
+      );
+    }
+
+    this.cars = this.cars.map((car) => {
+      if (car.id === id) {
+        carDB = {
+          ...car,
+          ...updateCarDto,
+          id,
+        };
+        return carDB;
+      }
+      return car;
+    });
+
+    return carDB;
   }
 }
