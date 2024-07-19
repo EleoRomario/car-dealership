@@ -8,7 +8,7 @@ export class UpdateCarDTO {
 
   @IsString()
   @IsOptional()
-  readonly make?: string;
+  readonly brand?: string;
 
   @IsString()
   @IsOptional()
